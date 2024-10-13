@@ -8,15 +8,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone repository.
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v5
+        with:
+         python-version: '3.x'
 
       - name: Install Dependencies
         run: |
             python3 --version
-            python3 -m pip install -U pip
+            python3 -m pip install --upgrade pip
             pip3 install requests
             pip3 install python-slugify
             pip3 install --no-cache-dir --force-reinstall git+https://github.com/sciunto-org/python-bibtexparser@main
