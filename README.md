@@ -1,54 +1,28 @@
 # sync-paperpile-notion
 
-Sync changes in Paperpile to a Notion database.
+Generated from [maria-antoniak/maria-paperpile-notion](https://github.com/maria-antoniak/maria-paperpile-notion) & [https://github.com/seba-1511/sync-paperpile-notion](https://github.com/seba-1511/sync-paperpile-notion). Follow the setup provided by them.
 
-## Setup
+Slight changes to sync.py & sync_to_notion.yaml:
 
-### On Notion
-
-1. Create a new database (e.g. "Papers") with the columns named exactly:
-
-    1. `Title` of type title.
-    2. `Authors` of type text.
-    3. `Year` of type text.
-    4. `Link` of type url.
-    5. `Reference ID` of type text.
-    6. `Tags` of type multiselect.
-
-2. Get the **database identifier** from the database page. If your database url is:
-
-    To get the database identifier of a Notion database, click on the ellipses of the table/database, then hit “View Database”, then click on the ellipses on the top right, click “Copy Link” and take the first hash from the resulting URL.
-
-4. Create a new integration on [https://www.notion.so/my-integrations/](https://www.notion.so/my-integrations/).
-
-    1. Name: Paperpile to Notion
-    2. Associated Workspace: Workspace of the database.
-    3. Content Capabilities: Read Content, Update Content, Insert Content.
-    4. User Capabilities: Read user information, including email addresses.
-    5. Press "Submit" and copy the **Internal Integration Token**.
-
-5. On the database page, click "Share" (top right) and add "Paperpile to Notion" with edit access.
-
-### On GitHub
-
-1. Fork this repository with the green "Use this template" button.
-2. On you fork, go to: "Settings -> Secrets -> Actions".
-3. Create 2 new repository secrets named exactly:
+- Updated lines to prevent error: `actions/checkout@v4` line 11; `actions/setup-python@v5` line 14; `python-version: '3.x'` line 16 in [sync_to_notion.yaml](https://github.com/Elahekhezri/maria-paperpile-notion/blob/main/.github/workflows/sync_to_notion.yaml) 
     
-    1. `NOTION_TOKEN`: Your integration's internal integration token, from step 3.5 above.
-    2. `DATABASE_IDENTIFIER`: Your database identifier, from step 2 above.
-4. Settings > Actions > General > Workflow Permissions > then check “Read and Write Permissions”
+- These columns are removed from [sync.py](https://github.com/Elahekhezri/maria-paperpile-notion/blob/main/sync.py): `Authors`, `Keywords`.
 
+# Common problems when forking above repositories
 
-### On Paperpile
+## 1. Deprecated node12 & Node.js version
 
-1. Click on the top-right gear, go to "Workflows and Integrations".
-2. Follow the instructions to add a new "BibTex Export", choosing:
+Solution -> commit the following changes to [sync_to_notion.yaml](https://github.com/Elahekhezri/maria-paperpile-notion/blob/main/.github/workflows/sync_to_notion.yaml):
+- `actions/checkout@v3` ✖️ -> `actions/checkout@v4` ✔️
 
-    1. Your GitHub repository fork as the repository.
-    2. `references.bib` as the export path.
+- `actions/setup-python@v4` ✖️ -> `actions/setup-python@v5` ✔️
 
-The first sync should start as soon as the Paperpile workflow is created, and subsequent syncs are triggered whenever papers are added or updated in your Paperpile.
+- add `with: python-version: '3.x'` after `actions/setup-python@v5`
 
-**Note**
-The first sync might take some time as Notion limits the API rate to ~ 3 requests / second; so if you have 1,000 papers it'll take ~ 6 minutes before they are all available in Notion.
+- add `--upgrade pip` to `Install Dependencies`
+
+## 2. `sync to notion` failing
+
+- Make sure Read and write permissions for workflow are granted (repository settings -> general -> actions -> workflow permissions)
+
+- Make sure you've used the correct DATABASE_IDENTIFIER: **<long_hash_1>** in [https://www.notion.so/<long_hash_1>?v=<long_hash_2>](https://www.notion.so/<long_hash_1>?v=<long_hash_2>)
