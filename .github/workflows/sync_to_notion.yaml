@@ -21,7 +21,7 @@ jobs:
             python3 -m pip install --upgrade pip
             pip3 install requests
             pip3 install python-slugify
-            pip3 install --no-cache-dir --force-reinstall git+https://github.com/sciunto-org/python-bibtexparser@main
+            pip3 install bibtexparser~=1.0
 
       - name: Sync to notion
         run: python sync.py
