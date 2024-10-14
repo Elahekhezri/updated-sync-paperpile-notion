@@ -23,6 +23,6 @@ Solution -> commit the following changes to [sync_to_notion.yaml](https://github
 
 ## 2. `sync to notion` failing
 
-- Make sure Read and write permissions for workflow are granted (repository settings -> general -> actions -> workflow permissions)
+- Make sure Read and write permissions for workflow are granted (repository settings -> actions -> general -> workflow permissions)
 
 - Make sure you've used the correct DATABASE_IDENTIFIER: **<long_hash_1>** in [https://www.notion.so/<long_hash_1>?v=<long_hash_2>](https://www.notion.so/<long_hash_1>?v=<long_hash_2>)
