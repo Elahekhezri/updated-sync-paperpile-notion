@@ -27,9 +27,7 @@ def get_payload(title='',
                 authors='',
                 year='',
                 ref_id='',
-                link='',
-                abstract='',
-                keywords=''):    
+                link=''):    
 
     payload = {
         "parent": {
@@ -57,16 +55,6 @@ def get_payload(title='',
     if authors:
         payload["properties"]['Authors'] = {"rich_text": [{"type": "text",
                                                            "text": {"content": authors}}]}
-
-    if abstract:
-        payload["properties"]['Abstract'] = {"rich_text": [{"type": "text",
-                                                            "text": {"content": abstract}}]}
-
-    if keywords:
-        formatted_keywords = [{"name": k} for k in keywords]
-        payload["properties"]["Keywords"] = {"multi_select": formatted_keywords}
-    else:
-        payload["properties"]["Keywords"] = {"multi_select": []}
     
     if link:
         payload["properties"]["Link"] = {"url": link}
@@ -85,9 +73,7 @@ def notion_add_entry(formatted_entry):
                           formatted_entry['authors'],  
                           formatted_entry['year'], 
                           formatted_entry['ref_id'],  
-                          formatted_entry['link'],  
-                          formatted_entry['abstract'],  
-                          formatted_entry['keywords'])
+                          formatted_entry['link'])
     
     response = requests.post(url, json=payload, headers=HEADERS)
     pprint.pprint(response)
@@ -96,10 +82,7 @@ def notion_add_entry(formatted_entry):
         payload = get_payload(formatted_entry['title'], 
                               formatted_entry['authors'],  
                               formatted_entry['year'], 
-                              formatted_entry['ref_id'],  
-                              formatted_entry['link'],  
-                              formatted_entry['abstract'],  
-                              [])
+                              formatted_entry['ref_id'])
         response = requests.post(url, json=payload, headers=HEADERS)
         pprint.pprint(response)
         pprint.pprint(response.reason)
@@ -114,9 +97,7 @@ def notion_update_page(page_id,
                           formatted_entry['authors'],  
                           formatted_entry['year'], 
                           formatted_entry['ref_id'],  
-                          formatted_entry['link'],  
-                          formatted_entry['abstract'],  
-                          formatted_entry['keywords'])
+                          formatted_entry['link'])
     response = requests.patch(url, json=payload, headers=HEADERS)
     pprint.pprint(response)
 
@@ -188,21 +169,12 @@ def get_notion_ref_ids():
             authors = _result['properties']['Authors']['rich_text'][0]['plain_text']
         if _result['properties']['Year']['rich_text']:
             year = _result['properties']['Year']['rich_text'][0]['plain_text']
-        if _result['properties']['Abstract']['rich_text']:
-            abstract = _result['properties']['Abstract']['rich_text'][0]['plain_text']
-            abstract = ' '.join(abstract.split())
-        if _result['properties']['Keywords']['multi_select']:
-            for _keyword in _result['properties']['Keywords']['multi_select']:
-                keywords.append(_keyword['name'].lower().strip())
-            keywords = sorted(keywords)
 
         new_entry = {'title': title,
                      'authors': authors,
                      'year': year,
                      'ref_id': ref_id,
-                     'link': link,
-                     'abstract': abstract,
-                     'keywords': keywords}
+                     'link': link}
                    
         archive.append(new_entry)
 
@@ -270,8 +242,6 @@ def get_bib_entry(entry):
     authors = ''
     year = ''
     link = None
-    abstract = ''
-    keywords = []
 
     # pprint.pprint('GETTING BIB ENTRY')
 
@@ -302,28 +272,11 @@ def get_bib_entry(entry):
         link = bib_dict['url'].value
     # pprint.pprint(link)
 
-    if 'abstract' in bib_dict:
-        abstract = bib_dict['abstract'].value
-        abstract = ' '.join(abstract.split())
-        abstract = clean_str(abstract)
-    # pprint.pprint(abstract)
-
-    if 'keywords' in bib_dict:
-        keywords = sorted(list(set([k.strip() for k in bib_dict['keywords'].value.lower().split(';')])))
-        keywords = [' '.join(k.split()) for k in keywords]
-        keywords = [slugify(k) for k in keywords] 
-        keywords = [k for k in keywords if k.strip()]
-        keywords = [k for k in keywords if len(k) < 30]
-        keywords = sorted(list(set(keywords)))
-    # pprint.pprint(keywords)
-
     formatted_entry = {'title': title,
                        'authors': authors,
                        'year': year,
                        'ref_id': ref_id,
-                       'link': link,
-                       'abstract': abstract,
-                       'keywords': keywords}
+                       'link': link}
            
     return ref_id, formatted_entry
 
